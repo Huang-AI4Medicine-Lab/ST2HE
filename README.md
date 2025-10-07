@@ -26,7 +26,7 @@ By integrating DAPI morphology and spatial transcript coordinates using a **one-
 The ST2HE framework converts high-resolution spatial transcriptomics (HR-ST) data into virtual H&E images through a one-step diffusion model built on Pix2Pix-Turbo, integrating DAPI morphology and transcript spatial coordinates.
 
 <p align="center">
-  <img src="figures/fig1_overview.png" alt="ST2HE framework overview" width="700"/>
+  <img src="figs/fig1_nmi.png" alt="ST2HE framework overview" width="700"/>
 </p>
 
 **Figure 1. Overview of ST2HE Framework.**
