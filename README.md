@@ -26,6 +26,10 @@ By integrating DAPI morphology and spatial transcript coordinates using a **one-
 
 The ST2HE framework converts high-resolution spatial transcriptomics (HR-ST) data into virtual H&E images through a one-step diffusion model built on Pix2Pix-Turbo, integrating DAPI morphology and transcript spatial coordinates.
 
+<p align="center">
+  <img src="figs/fig1_nmi.png" alt="ST2HE framework overview" width="700"/>
+</p>
+
 **Figure 1. Overview of ST2HE Framework.**
 - **(a)** ST2HE bridges transcriptomic data with histological features, enabling automated annotation of tumor subtypes.  
 - **(b)** Architecture: Encoder–U-Net–Decoder backbone with CLIP-based text conditioning ("This is a {tissue} H&E image" or "dapi2he").  
@@ -43,27 +47,24 @@ The ST2HE framework converts high-resolution spatial transcriptomics (HR-ST) dat
 - Python 3.8+
 - CUDA-capable GPU (recommended)
 - CUDA ≥ 11.8 and PyTorch ≥ 2.1 (for GPU acceleration)
-- The pix2pix-turbo model repository at `/ix/yufeihuang/timothy/cycleGAN/img2img-turbo/`
 
 ### Setup
 
-1. Clone or navigate to this repository:
+1. Clone the repository:
 ```bash
-cd /ix/yufeihuang/timothy/he2exp/st2he
+git clone https://github.com/Huang-AI4Medicine-Lab/ST2HE.git
+cd ST2HE
 ```
 
-2. Install dependencies:
+2. Create environment:
 ```bash
-pip install -r requirements.txt
-```
-
-Alternatively, create a conda environment:
-```bash
-conda env create -f environment.yml  # (if available)
+conda env create -f environment.yml
 conda activate st2he
 ```
 
-3. Ensure the pix2pix-turbo model is available at the expected path (update `PIX2PIX_TURBO_PATH` in `src/inference.py` if different).
+*(or use pip with `requirements.txt`)*
+
+3. Ensure the pix2pix-turbo model is available. The code expects it at `/ix/yufeihuang/timothy/cycleGAN/img2img-turbo/` by default. Update `PIX2PIX_TURBO_PATH` in `src/inference.py` (line 16) if your model is located elsewhere.
 
 ---
 
@@ -204,18 +205,20 @@ inference.predict_batch(
 ## Project Structure
 
 ```
-st2he/
+ST2HE/
 ├── src/
 │   ├── __init__.py              # Package initialization
 │   ├── inference.py             # Main inference module (ST2HEInference class)
 │   └── generate_samples.py      # Sample generation utilities
 ├── scripts/
-│   └── inference_batch.sh       # Batch processing script
+│   ├── inference_batch.sh       # Batch processing script
+│   └── setup_github.sh          # GitHub setup helper
 ├── examples/
 │   └── example_usage.py         # Example Python scripts
 ├── tests/                       # Unit tests
 ├── configs/
 │   └── default_config.yaml      # Configuration file template
+├── figs/                        # Figure images
 ├── requirements.txt             # Python dependencies
 ├── .gitignore                  # Git ignore rules
 └── README.md                   # This file
