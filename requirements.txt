@@ -1,0 +1,31 @@
+# Core dependencies
+torch>=2.0.1
+torchvision>=0.15.2
+torchaudio>=2.0.2
+numpy>=1.24.4
+pillow>=9.5.0
+
+# Diffusers and transformers (for pix2pix-turbo)
+diffusers==0.25.1
+transformers==4.35.2
+peft
+
+# Image processing
+opencv-python==4.6.0.66
+scipy==1.11.1
+
+# Utilities
+tqdm>=4.65.0
+einops>=0.6.1
+
+# Performance
+xformers>=0.0.20
+
+# Optional: for evaluation/metrics
+# lpips
+# clean-fid
+
+# Development (optional)
+# pytest
+# black
+# flake8

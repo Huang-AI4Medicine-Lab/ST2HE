@@ -1,0 +1,87 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Model files (usually large)
+*.pkl
+*.ckpt
+*.pth
+*.pt
+*.h5
+*.hdf5
+*.safetensors
+
+# Output directories
+outputs/
+results/
+wandb/
+*.log
+
+# Data files
+*.csv
+*.tsv
+*.parquet
+*.feather
+data/
+datasets/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Images (uncomment if you don't want to track images)
+# *.png
+# *.jpg
+# *.jpeg
+# *.tif
+# *.tiff
+
+# Large files
+*.zip
+*.tar
+*.gz
