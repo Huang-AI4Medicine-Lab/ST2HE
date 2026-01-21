@@ -3,7 +3,7 @@
 model:
   # Path to the trained pix2pix-turbo model checkpoint
   # Update this path to point to your trained model
-  path: "/ix/yufeihuang/timothy/cycleGAN/img2img-turbo/output/cyclegan_turbo/dps_col_bracs/checkpoints/model_25001.pkl"
+  path: "/path/to/your/model/checkpoint.pkl"
   
   # Text prompt for the model
   prompt: "image of HE"
@@ -24,7 +24,8 @@ inference:
 
 paths:
   # Default paths (can be overridden via command line)
-  pix2pix_turbo_root: "/ix/yufeihuang/timothy/cycleGAN/img2img-turbo"
+  # Set PIX2PIX_TURBO_PATH environment variable or update in src/inference.py
+  pix2pix_turbo_root: "path/to/pix2pix-turbo"
   default_input_dir: "/path/to/input/images"
   default_output_dir: "outputs/st2he_results"
 

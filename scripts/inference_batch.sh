@@ -2,7 +2,7 @@
 # Batch inference script for ST2HE conversion
 
 # Default paths (update these to match your setup)
-MODEL_PATH="/ix/yufeihuang/timothy/cycleGAN/img2img-turbo/output/cyclegan_turbo/dps_col_bracs/checkpoints/model_25001.pkl"
+MODEL_PATH="${MODEL_PATH:-/path/to/your/model/checkpoint.pkl}"
 INPUT_DIR="${INPUT_DIR:-/path/to/input/images}"
 OUTPUT_DIR="${OUTPUT_DIR:-outputs/st2he_results}"
 PROMPT="${PROMPT:-image of HE}"

@@ -20,7 +20,8 @@ def example_single_image():
     print("-" * 40)
     
     # Initialize model
-    model_path = "/ix/yufeihuang/timothy/cycleGAN/img2img-turbo/output/cyclegan_turbo/dps_col_bracs/checkpoints/model_25001.pkl"
+    # Update this path to point to your trained model checkpoint
+    model_path = "/path/to/your/model/checkpoint.pkl"
     
     inference = ST2HEInference(
         model_path=model_path,
@@ -45,7 +46,8 @@ def example_batch_processing():
     print("Example 2: Batch Processing")
     print("-" * 40)
     
-    model_path = "/ix/yufeihuang/timothy/cycleGAN/img2img-turbo/output/cyclegan_turbo/dps_col_bracs/checkpoints/model_25001.pkl"
+    # Update this path to point to your trained model checkpoint
+    model_path = "/path/to/your/model/checkpoint.pkl"
     
     inference = ST2HEInference(
         model_path=model_path,
@@ -66,7 +68,8 @@ def example_custom_configuration():
     print("Example 3: Custom Configuration")
     print("-" * 40)
     
-    model_path = "/ix/yufeihuang/timothy/cycleGAN/img2img-turbo/output/cyclegan_turbo/dps_col_bracs/checkpoints/model_25001.pkl"
+    # Update this path to point to your trained model checkpoint
+    model_path = "/path/to/your/model/checkpoint.pkl"
     
     # Custom configuration
     inference = ST2HEInference(

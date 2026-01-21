@@ -26,7 +26,8 @@ class TestST2HEInference(unittest.TestCase):
         """Test that default model path is accessible (if it exists)."""
         # This is a placeholder test
         # Update with actual model path validation if needed
-        model_path = "/ix/yufeihuang/timothy/cycleGAN/img2img-turbo/output/cyclegan_turbo/dps_col_bracs/checkpoints/model_25001.pkl"
+        # Update with your actual model path for testing
+        model_path = "/path/to/your/model/checkpoint.pkl"
         # Check if path exists (optional - skip if model not available)
         if Path(model_path).exists():
             self.assertTrue(Path(model_path).exists())

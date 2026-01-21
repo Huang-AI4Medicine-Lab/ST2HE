@@ -13,7 +13,8 @@ from torchvision import transforms
 from typing import Union, Optional
 
 # Add pix2pix turbo model path to sys.path
-PIX2PIX_TURBO_PATH = "/ix/yufeihuang/timothy/cycleGAN/img2img-turbo"
+# Update this path to point to your pix2pix-turbo repository location
+PIX2PIX_TURBO_PATH = os.environ.get("PIX2PIX_TURBO_PATH", "path/to/pix2pix-turbo")
 sys.path.insert(0, os.path.join(PIX2PIX_TURBO_PATH, "src"))
 
 try:

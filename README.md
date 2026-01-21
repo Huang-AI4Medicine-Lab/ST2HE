@@ -64,7 +64,9 @@ conda activate st2he
 
 *(or use pip with `requirements.txt`)*
 
-3. Ensure the pix2pix-turbo model is available. The code expects it at `/ix/yufeihuang/timothy/cycleGAN/img2img-turbo/` by default. Update `PIX2PIX_TURBO_PATH` in `src/inference.py` (line 16) if your model is located elsewhere.
+3. Set the pix2pix-turbo repository path:
+   - Set the `PIX2PIX_TURBO_PATH` environment variable, or
+   - Update `PIX2PIX_TURBO_PATH` in `src/inference.py` (line 16) to point to your pix2pix-turbo repository location
 
 ---
 
@@ -228,12 +230,9 @@ ST2HE/
 
 ## Model Paths
 
-By default, the code expects the pix2pix-turbo model at:
-```
-/ix/yufeihuang/timothy/cycleGAN/img2img-turbo/
-```
-
-Update the `PIX2PIX_TURBO_PATH` variable in `src/inference.py` (line 16) if your model is located elsewhere.
+The code requires the pix2pix-turbo repository. Set the path using:
+- Environment variable: `export PIX2PIX_TURBO_PATH="/path/to/pix2pix-turbo"`
+- Or update `PIX2PIX_TURBO_PATH` in `src/inference.py` (line 16)
 
 ---
 
@@ -243,7 +242,7 @@ Update the `PIX2PIX_TURBO_PATH` variable in `src/inference.py` (line 16) if your
 
 ```bash
 python src/inference.py \
-    --model_path /ix/yufeihuang/timothy/cycleGAN/img2img-turbo/output/cyclegan_turbo/dps_col_bracs/checkpoints/model_25001.pkl \
+    --model_path /path/to/your/model/checkpoint.pkl \
     --input /path/to/dps_image.png \
     --output /path/to/he_output.png \
     --prompt "This is a breast H&E image" \

@@ -4,18 +4,17 @@ This guide will help you get started with ST2HE quickly.
 
 ## Prerequisites
 
-1. Ensure you have the pix2pix-turbo model repository at:
-   ```
-   /ix/yufeihuang/timothy/cycleGAN/img2img-turbo/
-   ```
-
+1. Ensure you have the pix2pix-turbo model repository cloned/downloaded
 2. Have your trained model checkpoint ready (e.g., `model_25001.pkl`)
 
 ## Installation
 
 ```bash
-cd /ix/yufeihuang/timothy/he2exp/st2he
+cd ST2HE
 pip install -r requirements.txt
+
+# Set the path to your pix2pix-turbo repository
+export PIX2PIX_TURBO_PATH="/path/to/pix2pix-turbo"
 ```
 
 ## Quick Examples
