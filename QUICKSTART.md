@@ -5,7 +5,7 @@ This guide will help you get started with ST2HE quickly.
 ## Prerequisites
 
 1. Install the Python dependencies from `requirements.txt`
-2. Put your trained ST2HE weights in `weights/` (for example `weights/UnCondGen.pkl`)
+2. Use one of the bundled ST2HE weights in `weights/` such as `weights/UnCondGen.pkl` or `weights/CondGen.pkl`
 
 ## Installation
 

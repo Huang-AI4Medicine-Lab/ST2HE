@@ -63,10 +63,10 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Place your pretrained ST2HE weights in `weights/`.
-   - Review-time pix2pix weights used `model_9501.pkl`.
-   - This repo now includes bundled weights files `weights/UnCondGen.pkl` and `weights/CondGen.pkl`.
-   - See `weights/README.md` for provenance.
+3. The repo includes bundled ST2HE weights in `weights/`.
+   - `weights/UnCondGen.pkl`
+   - `weights/CondGen.pkl`
+   - See `weights/README.md` for weight provenance.
 
 4. For Xenium-native input preparation, make sure your sample directory contains:
    - `outs/morphology.ome.tif`
@@ -118,7 +118,7 @@ python src/inference.py \
 **Example: Xenium sample (Conditional Generation)**
 ```bash
 python src/inference.py \
-    --model_path /path/to/model/UnCondGen.pkl \
+    --model_path weights/CondGen.pkl \
     --input data/xenium/sample1_dapi.png \
     --output results/sample1_virtual_he.png \
     --prompt "This is a breast H&E image" \
@@ -128,7 +128,7 @@ python src/inference.py \
 **Example: Unseen tissue - Unconditional Generation**
 ```bash
 python src/inference.py \
-    --model_path /path/to/model/UncondGen.pkl \
+    --model_path weights/UnCondGen.pkl \
     --input data/ks/core_01_dapi.png \
     --output results/core_01_virtual_he.png \
     --prompt "dapi2he" \
