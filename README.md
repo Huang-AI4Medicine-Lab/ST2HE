@@ -58,15 +58,45 @@ cd ST2HE
 
 2. Create environment:
 ```bash
-conda env create -f environment.yml
-conda activate st2he
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-*(or use pip with `requirements.txt`)*
+3. Place your pretrained ST2HE weights in `weights/`.
+   - Review-time pix2pix weights used `model_9501.pkl`.
+   - This repo now includes bundled weights files `weights/UnCondGen.pkl` and `weights/CondGen.pkl`.
+   - See `weights/README.md` for provenance.
 
-3. Set the pix2pix-turbo repository path:
-   - Set the `PIX2PIX_TURBO_PATH` environment variable, or
-   - Update `PIX2PIX_TURBO_PATH` in `src/inference.py` (line 16) to point to your pix2pix-turbo repository location
+4. For Xenium-native input preparation, make sure your sample directory contains:
+   - `outs/morphology.ome.tif`
+   - `outs/transcripts.parquet`
+   - a tile manifest CSV with `cell_id`, `x_centroid`, and `y_centroid`
+
+### Quickstart: Prepare Xenium Inputs
+
+Generate `512x512` ST2HE-ready PNG inputs directly from a Xenium sample:
+
+```bash
+python scripts/generate_xenium_inputs.py \
+    --xenium-dir /path/to/xenium_sample \
+    --tiles-csv /path/to/tiles.csv \
+    --output-dir /path/to/dps_tiles
+```
+
+Useful options:
+- `--dapi-only` to generate grayscale DAPI tiles without transcript overlays
+- `--qv-threshold 20` to control transcript quality filtering
+- `--resample-scale 0.2125` to match the Xenium breast reference preprocessing
+- `--tile-size 512` to change the crop size
+
+By default the script reads `outs/morphology.ome.tif`, filters out control probes plus transcripts with `qv < 20`, and writes one `512x512` PNG per manifest row.
+
+The tile manifest should contain:
+- `cell_id`
+- `x_centroid`
+- `y_centroid`
+- optional `tile_id` to override the output filename
 
 ---
 
@@ -78,7 +108,7 @@ Convert a single spatial transcriptomics image to H&E:
 
 ```bash
 python src/inference.py \
-    --model_path /path/to/model/checkpoint.pkl \
+    --model_path /path/to/model/UnCondGen.pkl \
     --input /path/to/input/image.png \
     --output /path/to/output/image.png \
     --prompt "image of HE" \
@@ -88,7 +118,7 @@ python src/inference.py \
 **Example: Xenium sample (Conditional Generation)**
 ```bash
 python src/inference.py \
-    --model_path /path/to/st2he_condgen_model.pkl \
+    --model_path /path/to/model/UnCondGen.pkl \
     --input data/xenium/sample1_dapi.png \
     --output results/sample1_virtual_he.png \
     --prompt "This is a breast H&E image" \
@@ -98,7 +128,7 @@ python src/inference.py \
 **Example: Unseen tissue - Unconditional Generation**
 ```bash
 python src/inference.py \
-    --model_path /path/to/st2he_uncongen_model.pkl \
+    --model_path /path/to/model/UncondGen.pkl \
     --input data/ks/core_01_dapi.png \
     --output results/core_01_virtual_he.png \
     --prompt "dapi2he" \
@@ -111,7 +141,7 @@ Process a directory of images:
 
 ```bash
 python src/inference.py \
-    --model_path /path/to/model/checkpoint.pkl \
+    --model_path weights/UnCondGen.pkl \
     --input /path/to/input/directory \
     --output /path/to/output/directory \
     --prompt "image of HE" \
@@ -125,7 +155,7 @@ bash scripts/inference_batch.sh
 
 Customize with environment variables:
 ```bash
-export MODEL_PATH="/path/to/model/checkpoint.pkl"
+export MODEL_PATH="weights/UnCondGen.pkl"
 export INPUT_DIR="/path/to/input/images"
 export OUTPUT_DIR="/path/to/output/images"
 export PROMPT="This is a breast H&E image"
@@ -138,7 +168,7 @@ Generate multiple variations and comparison images:
 
 ```bash
 python src/generate_samples.py \
-    --model_path /path/to/model/checkpoint.pkl \
+    --model_path weights/UnCondGen.pkl \
     --input /path/to/input/image1.png /path/to/input/image2.png \
     --output_dir /path/to/output/directory \
     --num_variations 3 \
@@ -148,7 +178,7 @@ python src/generate_samples.py \
 Process all images in a directory:
 ```bash
 python src/generate_samples.py \
-    --model_path /path/to/model/checkpoint.pkl \
+    --model_path weights/UnCondGen.pkl \
     --input /path/to/input/directory \
     --output_dir /path/to/output/directory \
     --num_variations 2
@@ -163,7 +193,7 @@ from src.inference import ST2HEInference
 
 # Initialize model
 inference = ST2HEInference(
-    model_path="/path/to/model/checkpoint.pkl",
+    model_path="weights/UnCondGen.pkl",
     prompt="This is a breast H&E image",  # or "dapi2he" for unconditional
     direction="a2b",
     use_fp16=True  # Faster inference on compatible GPUs
@@ -186,13 +216,12 @@ inference.predict_batch(
 
 ### Model Parameters
 
-- `--model_path`: Path to the trained pix2pix-turbo model checkpoint (.pkl file)
+- `--model_path`: Path to the trained pix2pix-turbo weights file (`.pkl`)
 - `--prompt`: Text prompt for the model
   - Conditional mode: `"This is a {tissue} H&E image"` (e.g., "This is a breast H&E image")
   - Unconditional mode: `"dapi2he"` or `"image of HE"`
 - `--direction`: Translation direction
   - `a2b`: Spatial transcriptomics → H&E (default)
-  - `b2a`: H&E → Spatial transcriptomics
 - `--image_prep`: Image preparation method
   - `no_resize`: Use original image size (default)
   - `resize_512x512`: Resize to 512x512
@@ -208,12 +237,19 @@ inference.predict_batch(
 
 ```
 ST2HE/
+├── weights/
+│   ├── UnCondGen.pkl            # Bundled unconditional ST2HE weights
+│   ├── CondGen.pkl              # Bundled conditional ST2HE weights
+│   └── README.md                # Weight provenance notes
 ├── src/
 │   ├── __init__.py              # Package initialization
 │   ├── inference.py             # Main inference module (ST2HEInference class)
-│   └── generate_samples.py      # Sample generation utilities
+│   ├── generate_samples.py      # Sample generation utilities
+│   ├── xenium_input_generation.py  # Xenium-native input generation library
+│   └── st2he_vendor/            # Vendored pix2pix-turbo inference backbone
 ├── scripts/
 │   ├── inference_batch.sh       # Batch processing script
+│   ├── generate_xenium_inputs.py  # Xenium-native tile generation CLI
 │   └── setup_github.sh          # GitHub setup helper
 ├── examples/
 │   └── example_usage.py         # Example Python scripts
@@ -230,9 +266,10 @@ ST2HE/
 
 ## Model Paths
 
-The code requires the pix2pix-turbo repository. Set the path using:
-- Environment variable: `export PIX2PIX_TURBO_PATH="/path/to/pix2pix-turbo"`
-- Or update `PIX2PIX_TURBO_PATH` in `src/inference.py` (line 16)
+The repo vendors the pix2pix-turbo inference backbone directly. You only need:
+- the Python dependencies in `requirements.txt`
+- a local ST2HE weights file such as `weights/UnCondGen.pkl`
+- network access or a local cache for the base `stabilityai/sd-turbo` weights used by diffusers
 
 ---
 
@@ -242,7 +279,7 @@ The code requires the pix2pix-turbo repository. Set the path using:
 
 ```bash
 python src/inference.py \
-    --model_path /path/to/your/model/checkpoint.pkl \
+    --model_path weights/UnCondGen.pkl \
     --input /path/to/dps_image.png \
     --output /path/to/he_output.png \
     --prompt "This is a breast H&E image" \

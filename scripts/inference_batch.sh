@@ -2,10 +2,10 @@
 # Batch inference script for ST2HE conversion
 
 # Default paths (update these to match your setup)
-MODEL_PATH="${MODEL_PATH:-/path/to/your/model/checkpoint.pkl}"
+MODEL_PATH="${MODEL_PATH:-weights/UnCondGen.pkl}"
 INPUT_DIR="${INPUT_DIR:-/path/to/input/images}"
 OUTPUT_DIR="${OUTPUT_DIR:-outputs/st2he_results}"
-PROMPT="${PROMPT:-image of HE}"
+PROMPT="${PROMPT:-dapi2he}"
 DIRECTION="${DIRECTION:-a2b}"
 IMAGE_PREP="${IMAGE_PREP:-no_resize}"
 

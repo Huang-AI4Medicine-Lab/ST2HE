@@ -4,20 +4,39 @@ This guide will help you get started with ST2HE quickly.
 
 ## Prerequisites
 
-1. Ensure you have the pix2pix-turbo model repository cloned/downloaded
-2. Have your trained model checkpoint ready (e.g., `model_25001.pkl`)
+1. Install the Python dependencies from `requirements.txt`
+2. Put your trained ST2HE weights in `weights/` (for example `weights/UnCondGen.pkl`)
 
 ## Installation
 
 ```bash
 cd ST2HE
 pip install -r requirements.txt
-
-# Set the path to your pix2pix-turbo repository
-export PIX2PIX_TURBO_PATH="/path/to/pix2pix-turbo"
 ```
 
 ## Quick Examples
+
+### 0. Prepare Xenium Inputs
+
+If you are starting from a Xenium sample directory, first generate ST2HE-ready PNG tiles:
+
+```bash
+python scripts/generate_xenium_inputs.py \
+    --xenium-dir /path/to/xenium_sample \
+    --tiles-csv /path/to/tiles.csv \
+    --output-dir /path/to/dps_tiles
+```
+
+Expected inputs:
+- `xenium_sample/outs/morphology.ome.tif`
+- `xenium_sample/outs/transcripts.parquet`
+- a CSV manifest with `cell_id`, `x_centroid`, `y_centroid`, and optional `tile_id`
+
+Useful flags:
+- `--dapi-only`
+- `--qv-threshold 20`
+- `--resample-scale 0.2125`
+- `--tile-size 512`
 
 ### 1. Convert a Single Image
 
@@ -73,7 +92,7 @@ inference.predict_batch(
 ## Common Issues
 
 ### Import Error
-If you see import errors, make sure the pix2pix-turbo path is correct in `src/inference.py` (line 16).
+If you see import errors, confirm that `requirements.txt` is installed in the Python environment you are using.
 
 ### CUDA Out of Memory
 - Use `--use_fp16` flag for faster inference with less memory
@@ -81,7 +100,7 @@ If you see import errors, make sure the pix2pix-turbo path is correct in `src/in
 - Reduce image size using `--image_prep resize_512x512`
 
 ### Model Not Found
-Ensure your model checkpoint path is correct and the file exists.
+Ensure your model weights path is correct and the file exists.
 
 ## Next Steps
 

@@ -1,14 +1,14 @@
 # Default configuration for ST2HE inference
 
 model:
-  # Path to the trained pix2pix-turbo model checkpoint
-  # Update this path to point to your trained model
-  path: "/path/to/your/model/checkpoint.pkl"
+  # Path to the trained pix2pix-turbo weights file
+  # Update this path to point to your trained weights
+  path: "weights/UnCondGen.pkl"
   
   # Text prompt for the model
   prompt: "image of HE"
   
-  # Translation direction: "a2b" (ST->H&E) or "b2a" (H&E->ST)
+  # Translation direction used by the vendored pix2pix-turbo ST2HE inference
   direction: "a2b"
   
   # Image preparation method
@@ -24,8 +24,6 @@ inference:
 
 paths:
   # Default paths (can be overridden via command line)
-  # Set PIX2PIX_TURBO_PATH environment variable or update in src/inference.py
-  pix2pix_turbo_root: "path/to/pix2pix-turbo"
   default_input_dir: "/path/to/input/images"
   default_output_dir: "outputs/st2he_results"
 

@@ -1,10 +1,9 @@
-"""
-Unit tests for ST2HE inference module.
-"""
+"""Unit tests for the ST2HE inference module."""
 
-import unittest
+import importlib
 from pathlib import Path
 import sys
+import unittest
 
 # Add src to path
 project_root = Path(__file__).parent.parent
@@ -13,26 +12,22 @@ sys.path.insert(0, str(project_root / "src"))
 
 class TestST2HEInference(unittest.TestCase):
     """Test cases for ST2HEInference class."""
-    
-    def test_import(self):
-        """Test that the module can be imported."""
-        try:
-            from inference import ST2HEInference
-            self.assertTrue(True)
-        except ImportError as e:
-            self.fail(f"Failed to import ST2HEInference: {e}")
-    
-    def test_model_path_exists(self):
-        """Test that default model path is accessible (if it exists)."""
-        # This is a placeholder test
-        # Update with actual model path validation if needed
-        # Update with your actual model path for testing
-        model_path = "/path/to/your/model/checkpoint.pkl"
-        # Check if path exists (optional - skip if model not available)
-        if Path(model_path).exists():
-            self.assertTrue(Path(model_path).exists())
-        else:
-            self.skipTest(f"Model path {model_path} does not exist")
+
+    def tearDown(self):
+        sys.modules.pop("inference", None)
+
+    def test_import_is_lightweight(self):
+        """Importing the module should not require external pix2pix repo setup."""
+        module = importlib.import_module("inference")
+        self.assertTrue(hasattr(module, "ST2HEInference"))
+
+    def test_missing_weights_file_fails_fast(self):
+        """A missing weights file should raise before model dependencies are touched."""
+        inference = importlib.import_module("inference")
+        missing_path = "/tmp/definitely_missing_st2he_weights.pkl"
+        with self.assertRaises(FileNotFoundError) as exc:
+            inference.ST2HEInference(model_path=missing_path)
+        self.assertIn(missing_path, str(exc.exception))
 
 
 if __name__ == "__main__":

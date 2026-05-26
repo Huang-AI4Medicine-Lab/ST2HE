@@ -46,6 +46,12 @@ ENV/
 *.h5
 *.hdf5
 *.safetensors
+!weights/
+!weights/*.pkl
+!weights/*.ckpt
+!weights/*.pth
+!weights/*.pt
+!weights/*.safetensors
 
 # Output directories
 outputs/

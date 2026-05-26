@@ -14,14 +14,33 @@ sys.path.insert(0, str(project_root / "src"))
 from inference import ST2HEInference
 
 
+def example_prepare_xenium_inputs():
+    """Example: Prepare ST2HE-ready Xenium tiles."""
+    print("Example 0: Xenium Input Preparation")
+    print("-" * 40)
+
+    xenium_dir = "/path/to/xenium_sample"
+    tiles_csv = "/path/to/tiles.csv"
+    output_dir = "/path/to/dps_tiles"
+
+    print("Run the CLI below to generate DAPI-plus-transcript input tiles:")
+    print(
+        "python scripts/generate_xenium_inputs.py "
+        f"--xenium-dir {xenium_dir} "
+        f"--tiles-csv {tiles_csv} "
+        f"--output-dir {output_dir}"
+    )
+    print()
+
+
 def example_single_image():
     """Example: Convert a single image."""
     print("Example 1: Single Image Conversion")
     print("-" * 40)
     
     # Initialize model
-    # Update this path to point to your trained model checkpoint
-    model_path = "/path/to/your/model/checkpoint.pkl"
+    # Update this path to point to your trained weights file
+    model_path = "weights/UnCondGen.pkl"
     
     inference = ST2HEInference(
         model_path=model_path,
@@ -46,8 +65,8 @@ def example_batch_processing():
     print("Example 2: Batch Processing")
     print("-" * 40)
     
-    # Update this path to point to your trained model checkpoint
-    model_path = "/path/to/your/model/checkpoint.pkl"
+    # Update this path to point to your trained weights file
+    model_path = "weights/UnCondGen.pkl"
     
     inference = ST2HEInference(
         model_path=model_path,
@@ -68,8 +87,8 @@ def example_custom_configuration():
     print("Example 3: Custom Configuration")
     print("-" * 40)
     
-    # Update this path to point to your trained model checkpoint
-    model_path = "/path/to/your/model/checkpoint.pkl"
+    # Update this path to point to your trained weights file
+    model_path = "weights/UnCondGen.pkl"
     
     # Custom configuration
     inference = ST2HEInference(
@@ -96,6 +115,7 @@ if __name__ == "__main__":
     print("Uncomment the example you want to run.\n")
     
     # Uncomment the example you want to run:
+    # example_prepare_xenium_inputs()
     # example_single_image()
     # example_batch_processing()
     # example_custom_configuration()

@@ -13,6 +13,15 @@ peft
 # Image processing
 opencv-python==4.6.0.66
 scipy==1.11.1
+tifffile>=2023.7.10
+
+# Xenium input generation
+pandas>=2.0.3
+pyarrow>=12.0.1
+matplotlib>=3.7.2
+seaborn>=0.12.2
+zarr>=2.16.1
+dask[array]>=2023.8.1
 
 # Utilities
 tqdm>=4.65.0

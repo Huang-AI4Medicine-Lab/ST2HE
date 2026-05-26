@@ -1,30 +1,13 @@
-"""
-ST2HE Inference Module
-Converts spatial transcriptomics data to H&E images using pix2pix turbo model.
-"""
+"""ST2HE inference entry point built on a vendored pix2pix-turbo backbone."""
 
-import os
-import sys
+from __future__ import annotations
+
 import argparse
 from pathlib import Path
-from PIL import Image
-import torch
-from torchvision import transforms
-from typing import Union, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
-# Add pix2pix turbo model path to sys.path
-# Update this path to point to your pix2pix-turbo repository location
-PIX2PIX_TURBO_PATH = os.environ.get("PIX2PIX_TURBO_PATH", "path/to/pix2pix-turbo")
-sys.path.insert(0, os.path.join(PIX2PIX_TURBO_PATH, "src"))
-
-try:
-    from cyclegan_turbo import CycleGAN_Turbo
-    from my_utils.training_utils import build_transform
-except ImportError as e:
-    raise ImportError(
-        f"Could not import pix2pix turbo modules. "
-        f"Please ensure the model is available at {PIX2PIX_TURBO_PATH}. Error: {e}"
-    )
+if TYPE_CHECKING:
+    from PIL import Image as PILImage
 
 
 class ST2HEInference:
@@ -45,44 +28,66 @@ class ST2HEInference:
         Initialize the ST2HE inference model.
         
         Args:
-            model_path: Path to the trained pix2pix turbo model checkpoint
+            model_path: Path to the trained pix2pix-turbo weights file
             prompt: Text prompt for the model (default: "image of HE")
-            direction: Translation direction, either "a2b" or "b2a" (default: "a2b")
+            direction: Translation direction. The vendored ST2HE path supports "a2b".
             image_prep: Image preparation method (default: "no_resize")
             use_fp16: Whether to use float16 precision for faster inference
             device: Device to run inference on (default: "cuda" if available, else "cpu")
         """
-        self.model_path = model_path
+        self.model_path = Path(model_path)
+        if not self.model_path.exists():
+            raise FileNotFoundError(f"Model weights file not found: {self.model_path}")
+
         self.prompt = prompt
         self.direction = direction
         self.image_prep = image_prep
         self.use_fp16 = use_fp16
-        
+
+        if self.direction != "a2b":
+            raise ValueError("The vendored pix2pix-turbo ST2HE inference only supports direction='a2b'.")
+
+        runtime = self._load_runtime_dependencies()
+        self._image_module = runtime["image"]
+        self._torch = runtime["torch"]
+        self._transforms = runtime["transforms"]
+
         if device is None:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
+            device = "cuda" if self._torch.cuda.is_available() else "cpu"
         self.device = device
-        
-        # Initialize model
-        print(f"Loading model from {model_path}...")
-        self.model = CycleGAN_Turbo(pretrained_name=None, pretrained_path=model_path)
-        self.model.eval()
-        
-        # Move model to device if needed (models from CycleGAN_Turbo are typically on CUDA by default)
-        if device != "cuda" and hasattr(self.model, 'to'):
-            self.model = self.model.to(device)
-        
-        if hasattr(self.model, 'unet'):
-            self.model.unet.enable_xformers_memory_efficient_attention()
-        
+
+        print(f"Loading model from {self.model_path}...")
+        self.model = runtime["model_class"](
+            pretrained_name=None,
+            pretrained_path=str(self.model_path),
+            device=self.device,
+            enable_xformers=True,
+        )
+        self.model.set_eval()
+
         if use_fp16:
             self.model.half()
-        
-        # Build transform
-        self.transform = build_transform(image_prep)
-        
+
+        self.transform = runtime["build_transform"](image_prep)
         print(f"Model loaded successfully. Using device: {self.device}")
-    
-    def predict(self, input_image: Union[str, Image.Image]) -> Image.Image:
+
+    @staticmethod
+    def _load_runtime_dependencies():
+        from PIL import Image
+        import torch
+        from torchvision import transforms
+
+        from st2he_vendor import Pix2Pix_Turbo, build_transform
+
+        return {
+            "build_transform": build_transform,
+            "image": Image,
+            "model_class": Pix2Pix_Turbo,
+            "torch": torch,
+            "transforms": transforms,
+        }
+
+    def predict(self, input_image: Union[str, Path, "PILImage"]) -> "PILImage":
         """
         Convert spatial transcriptomics image to H&E image.
         
@@ -93,27 +98,29 @@ class ST2HEInference:
             PIL Image of the generated H&E image
         """
         # Load image if path is provided
-        if isinstance(input_image, str):
-            input_image = Image.open(input_image).convert('RGB')
-        
-        # Prepare input
-        with torch.no_grad():
+        if isinstance(input_image, (str, Path)):
+            input_image = self._image_module.open(input_image).convert("RGB")
+
+        with self._torch.no_grad():
             input_img = self.transform(input_image)
-            x_t = transforms.ToTensor()(input_img)
-            x_t = transforms.Normalize([0.5], [0.5])(x_t).unsqueeze(0).to(self.device)
-            
+            x_t = self._transforms.ToTensor()(input_img)
+            x_t = self._transforms.Normalize(
+                [0.5, 0.5, 0.5],
+                [0.5, 0.5, 0.5],
+            )(x_t).unsqueeze(0).to(self.device)
+
             if self.use_fp16:
                 x_t = x_t.half()
-            
-            # Run inference
-            output = self.model(x_t, direction=self.direction, caption=self.prompt)
-        
-        # Convert output to PIL Image
-        output_pil = transforms.ToPILImage()(output[0].cpu() * 0.5 + 0.5)
-        output_pil = output_pil.resize((input_image.width, input_image.height), Image.LANCZOS)
-        
+
+            output = self.model(x_t, prompt=self.prompt)
+
+        output_pil = self._transforms.ToPILImage()(output[0].cpu() * 0.5 + 0.5)
+        output_pil = output_pil.resize(
+            (input_image.width, input_image.height),
+            self._image_module.LANCZOS,
+        )
         return output_pil
-    
+
     def predict_batch(
         self,
         input_dir: str,
@@ -132,15 +139,13 @@ class ST2HEInference:
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
         
-        # Find all image files
         image_files = []
         for ext in image_extensions:
             image_files.extend(input_path.glob(f"*{ext}"))
             image_files.extend(input_path.glob(f"*{ext.upper()}"))
-        
+
         print(f"Found {len(image_files)} images to process")
-        
-        # Process each image
+
         for img_path in image_files:
             print(f"Processing {img_path.name}...")
             try:
@@ -161,7 +166,7 @@ def main():
         '--model_path',
         type=str,
         required=True,
-        help='Path to the trained pix2pix turbo model checkpoint'
+        help='Path to the trained pix2pix-turbo weights file'
     )
     parser.add_argument(
         '--input',
@@ -185,8 +190,8 @@ def main():
         '--direction',
         type=str,
         default="a2b",
-        choices=["a2b", "b2a"],
-        help='Translation direction (default: "a2b")'
+        choices=["a2b"],
+        help='Translation direction (only "a2b" is supported)'
     )
     parser.add_argument(
         '--image_prep',

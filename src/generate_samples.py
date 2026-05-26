@@ -177,7 +177,7 @@ def main():
         '--model_path',
         type=str,
         required=True,
-        help='Path to the trained pix2pix turbo model checkpoint'
+        help='Path to the trained pix2pix-turbo weights file'
     )
     parser.add_argument(
         '--input',
@@ -202,8 +202,8 @@ def main():
         '--direction',
         type=str,
         default="a2b",
-        choices=["a2b", "b2a"],
-        help='Translation direction (default: "a2b")'
+        choices=["a2b"],
+        help='Translation direction (only "a2b" is supported)'
     )
     parser.add_argument(
         '--image_prep',
