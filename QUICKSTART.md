@@ -42,28 +42,33 @@ Useful flags:
 
 ```bash
 python src/inference.py \
-    --model_path /path/to/your/model.pkl \
+    --model_path weights/UnCondGen.pkl \
     --input /path/to/input_image.png \
-    --output /path/to/output_image.png
+    --output /path/to/output_image.png \
+    --prompt "dapi2he"
 ```
+
+Use `weights/CondGen.pkl` with a tissue-specific prompt such as `"This is a breast H&E image"` for conditional generation.
 
 ### 2. Process Multiple Images
 
 ```bash
 python src/inference.py \
-    --model_path /path/to/your/model.pkl \
+    --model_path weights/UnCondGen.pkl \
     --input /path/to/input/directory \
-    --output /path/to/output/directory
+    --output /path/to/output/directory \
+    --prompt "dapi2he"
 ```
 
 ### 3. Generate Samples with Comparisons
 
 ```bash
 python src/generate_samples.py \
-    --model_path /path/to/your/model.pkl \
+    --model_path weights/UnCondGen.pkl \
     --input /path/to/input/directory \
     --output_dir /path/to/output/directory \
-    --num_variations 2
+    --num_variations 2 \
+    --prompt "dapi2he"
 ```
 
 ## Using the Python API
@@ -73,7 +78,7 @@ from src.inference import ST2HEInference
 
 # Initialize
 inference = ST2HEInference(
-    model_path="/path/to/model.pkl",
+    model_path="weights/UnCondGen.pkl",
     prompt="image of HE",
     direction="a2b"
 )
@@ -101,6 +106,9 @@ If you see import errors, confirm that `requirements.txt` is installed in the Py
 
 ### Model Not Found
 Ensure your model weights path is correct and the file exists.
+
+### First Run Download
+The first inference run may download the base `stabilityai/sd-turbo` weights if they are not already cached.
 
 ## Next Steps
 

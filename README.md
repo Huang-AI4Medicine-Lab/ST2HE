@@ -1,7 +1,7 @@
 # ST2HE: Virtual Histology from High-Resolution Spatial Transcriptomics
 
-**ST2HE** is a cross-platform, generative framework that synthesizes **virtual Hematoxylin & Eosin (H&E)** histology images directly from **high-resolution spatial transcriptomics (HR-ST)** data.  
-By integrating DAPI morphology and spatial transcript coordinates using a **one-step diffusion model**, ST2HE bridges the gap between molecular and histological domains—enabling interpretable, scalable annotation of HR-ST datasets.
+**ST2HE** synthesizes **virtual Hematoxylin & Eosin (H&E)** histology images directly from **high-resolution spatial transcriptomics (HR-ST)** data.  
+It combines DAPI morphology and spatial transcript coordinates in a **one-step diffusion model** to connect molecular and histologic views of the same tissue.
 
 ---
 
@@ -66,12 +66,14 @@ pip install -r requirements.txt
 3. The repo includes bundled ST2HE weights in `weights/`.
    - `weights/UnCondGen.pkl`
    - `weights/CondGen.pkl`
-   - See `weights/README.md` for weight provenance.
+   - See `weights/README.md` for notes on the bundled files.
 
-4. For Xenium-native input preparation, make sure your sample directory contains:
+4. For Xenium input preparation, make sure your sample directory contains:
    - `outs/morphology.ome.tif`
    - `outs/transcripts.parquet`
    - a tile manifest CSV with `cell_id`, `x_centroid`, and `y_centroid`
+
+5. On first inference run, diffusers may download the base `stabilityai/sd-turbo` weights unless they are already cached locally.
 
 ### Quickstart: Prepare Xenium Inputs
 
@@ -193,8 +195,8 @@ from src.inference import ST2HEInference
 
 # Initialize model
 inference = ST2HEInference(
-    model_path="weights/UnCondGen.pkl",
-    prompt="This is a breast H&E image",  # or "dapi2he" for unconditional
+    model_path="weights/CondGen.pkl",
+    prompt="This is a breast H&E image",  # use UnCondGen.pkl with "dapi2he" for unconditional inference
     direction="a2b",
     use_fp16=True  # Faster inference on compatible GPUs
 )
@@ -240,17 +242,16 @@ ST2HE/
 ├── weights/
 │   ├── UnCondGen.pkl            # Bundled unconditional ST2HE weights
 │   ├── CondGen.pkl              # Bundled conditional ST2HE weights
-│   └── README.md                # Weight provenance notes
+│   └── README.md                # Notes on bundled weight files
 ├── src/
 │   ├── __init__.py              # Package initialization
 │   ├── inference.py             # Main inference module (ST2HEInference class)
 │   ├── generate_samples.py      # Sample generation utilities
-│   ├── xenium_input_generation.py  # Xenium-native input generation library
-│   └── st2he_vendor/            # Vendored pix2pix-turbo inference backbone
+│   ├── xenium_input_generation.py  # Xenium input generation library
+│   └── st2he_vendor/            # pix2pix-turbo inference backbone included in the repo
 ├── scripts/
 │   ├── inference_batch.sh       # Batch processing script
-│   ├── generate_xenium_inputs.py  # Xenium-native tile generation CLI
-│   └── setup_github.sh          # GitHub setup helper
+│   └── generate_xenium_inputs.py  # Xenium tile generation CLI
 ├── examples/
 │   └── example_usage.py         # Example Python scripts
 ├── tests/                       # Unit tests
@@ -266,7 +267,7 @@ ST2HE/
 
 ## Model Paths
 
-The repo vendors the pix2pix-turbo inference backbone directly. You only need:
+The repo includes the pix2pix-turbo inference backbone directly. You only need:
 - the Python dependencies in `requirements.txt`
 - a local ST2HE weights file such as `weights/UnCondGen.pkl`
 - network access or a local cache for the base `stabilityai/sd-turbo` weights used by diffusers
